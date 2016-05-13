@@ -8,8 +8,9 @@
 #include <fstream>
 
 class WCSimDetectorConstruction;
-class G4ParticleGun;
 class G4GeneralParticleSource;
+class G4SingleParticleSource;
+//class G4GeneralParticleSource;
 class G4Event;
 class WCSimPrimaryGeneratorMessenger;
 
@@ -53,8 +54,9 @@ public:
 
 private:
   WCSimDetectorConstruction*      myDetector;
-  G4ParticleGun*                  particleGun;
+  G4SingleParticleSource*                  particleGun;
   G4GeneralParticleSource*        MyGPS;  //T. Akiri: GPS to run Laser
+  G4GeneralParticleSource*        GPS; 
   WCSimPrimaryGeneratorMessenger* messenger;
 
   // Variables set by the messenger

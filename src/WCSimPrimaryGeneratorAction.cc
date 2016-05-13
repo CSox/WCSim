@@ -3,7 +3,7 @@
 #include "WCSimPrimaryGeneratorMessenger.hh"
 
 #include "G4Event.hh"
-#include "G4ParticleGun.hh"
+//#include "G4GeneralParticleSource.hh"
 #include "G4GeneralParticleSource.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
@@ -51,18 +51,22 @@ WCSimPrimaryGeneratorAction::WCSimPrimaryGeneratorAction(
   //---Set defaults. Do once at beginning of session.
   
   G4int n_particle = 1;
-  particleGun = new G4ParticleGun(n_particle);
-  particleGun->SetParticleEnergy(1.0*GeV);
-  particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.0));
+  GPS = new G4GeneralParticleSource();
+  GPS->AddaSource(1);
+  particleGun = GPS->GetCurrentSource();
+  particleGun->SetNumberOfParticles(n_particle);
+  particleGun->GetEneDist()->SetMonoEnergy(1.0*GeV);
+  particleGun->GetAngDist()->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.0));
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
   particleGun->
     SetParticleDefinition(particleTable->FindParticle(particleName="mu+"));
 
-  particleGun->
-    SetParticlePosition(G4ThreeVector(0.*m,0.*m,0.*m));
-    
+  particleGun->GetPosDist()->
+    SetCentreCoords(G4ThreeVector(0.*m,0.*m,0.*m));
+  particleGun->GetPosDist()->SetPosDisType("Point");
+
   messenger = new WCSimPrimaryGeneratorMessenger(this);
   useMulineEvt = true;
   useNormalEvt = false;
@@ -78,6 +82,7 @@ WCSimPrimaryGeneratorAction::~WCSimPrimaryGeneratorAction()
   }
   inputFile.close();
   delete particleGun;
+  delete GPS;
   delete MyGPS;   //T. Akiri: Delete the GPS variable
   delete messenger;
 }
@@ -196,10 +201,10 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 		    G4double ekin = energy - mass;
 
-		    particleGun->SetParticleEnergy(ekin);
+		    particleGun->GetEneDist()->SetMonoEnergy(ekin);
 		    //G4cout << "Particle: " << pdgid << " KE: " << ekin << G4endl;
-		    particleGun->SetParticlePosition(vtx);
-		    particleGun->SetParticleMomentumDirection(dir);
+		    particleGun->GetPosDist()->SetCentreCoords(vtx);
+		    particleGun->GetAngDist()->SetParticleMomentumDirection(dir);
 		    particleGun->GeneratePrimaryVertex(anEvent);
 		  }
 	      }
@@ -217,16 +222,16 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	G4ThreeVector vtx = G4ThreeVector(xPos, yPos, random_z);
 	G4ThreeVector dir = G4ThreeVector(xDir,yDir,zDir);
 
-	particleGun->SetParticleEnergy(energy*MeV);
-	particleGun->SetParticlePosition(vtx);
-	particleGun->SetParticleMomentumDirection(dir);
-	particleGun->GeneratePrimaryVertex(anEvent);
+	particleGun->GetEneDist()->SetMonoEnergy(energy*MeV);
+	particleGun->GetPosDist()->SetCentreCoords(vtx);
+	particleGun->GetAngDist()->SetParticleMomentumDirection(dir);
+	GPS->GeneratePrimaryVertex(anEvent);
       }
   }
 
   else if (useNormalEvt)
   {      // manual gun operation
-    particleGun->GeneratePrimaryVertex(anEvent);
+    GPS->GeneratePrimaryVertex(anEvent);
 
     G4ThreeVector P  =anEvent->GetPrimaryVertex()->GetPrimary()->GetMomentum();
     G4ThreeVector vtx=anEvent->GetPrimaryVertex()->GetPosition();
@@ -236,9 +241,9 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector dir  = P.unit();
     G4double E         = std::sqrt((P.dot(P))+(m*m));
 
-//     particleGun->SetParticleEnergy(E);
-//     particleGun->SetParticlePosition(vtx);
-//     particleGun->SetParticleMomentumDirection(dir);
+//     particleGun->GetEneDist()->SetMonoEnergy(E);
+//     particleGun->GetPosDist()->SetCentreCoords(vtx);
+//     particleGun->GetAngDist()->SetParticleMomentumDirection(dir);
 
     SetVtx(vtx);
     SetBeamEnergy(E);
