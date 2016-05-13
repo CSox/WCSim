@@ -100,6 +100,17 @@ WCSimDetectorMessenger::WCSimDetectorMessenger(WCSimDetectorConstruction* WCSimD
   waterTank_Length->SetUnitCandidates("mm cm m");
   WCConstruct = new G4UIcmdWithoutParameter("/WCSim/Construct", this);
   WCConstruct->SetGuidance("Update detector construction with new settings.");
+
+  GdCmd= new G4UIcmdWithAString("/WCSim/GdCmd", this);
+  GdCmd->SetGuidance("Set Gd doping.");
+  GdCmd->SetGuidance("Available options are:\n"
+			  "on\n"
+			  "off\n");
+  GdCmd->SetParameterName("GdCmd", false);
+  GdCmd->SetCandidates("on "
+			    "off ");
+  GdCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
 }
 
 WCSimDetectorMessenger::~WCSimDetectorMessenger()
@@ -223,6 +234,18 @@ void WCSimDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 
 	if(command == WCConstruct) {
 		WCSimDetector->UpdateGeometry();
+	}
+
+	if (command == GdCmd){
+	  G4cout << "Set Gd Doping " << newValue << " ";
+	  if (newValue == "on"){
+	    WCSimDetector->Set_WCAddGd(1);
+	    G4cout << "1";
+	  }else if (newValue == "off"){
+	    WCSimDetector->Set_WCAddGd(0);
+	    G4cout << "0";
+	  }
+	  G4cout << G4endl;
 	}
 
 }

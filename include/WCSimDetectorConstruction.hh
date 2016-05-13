@@ -137,6 +137,8 @@ public:
 
   G4String GetIDCollectionName(){return WCIDCollectionName;}
 
+  void Set_WCAddGd(G4bool choice){WCAddGd=choice;}
+  G4bool Get_WCAddGd(){ return WCAddGd;}
  
 private:
 

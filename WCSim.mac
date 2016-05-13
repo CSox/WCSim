@@ -36,8 +36,8 @@
 #/WCSim/HyperK/waterTank_Length 123750. mm # Equivalent length for 2 partitions
 #/WCSim/HyperK/waterTank_Length 247500. mm # Equivalent length for 1 partition
 
-
-#/WCSim/Construct # This must be uncommented in order to construct a new detector configuration. 
+/WCSim/GdCmd on
+/WCSim/Construct # This must be uncommented in order to construct a new detector configuration. 
 
 #Added for the PMT QE option 08/17/10 (XQ)
 # 1. Stacking only mean when the photon is generated
@@ -106,9 +106,9 @@
 
 # Or you can use the G4 Particle Gun
 /mygen/generator normal
-/gun/particle e-
+/gun/particle neutron
 #/gun/particle pi0
-/gun/energy 500 MeV
+/gun/energy 1 eV
 /gun/direction 1 0 0 
 /gun/position 0 0 0  
 
