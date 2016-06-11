@@ -51,9 +51,9 @@ WCSimPrimaryGeneratorAction::WCSimPrimaryGeneratorAction(
   //---Set defaults. Do once at beginning of session.
   
   G4int n_particle = 1;
-  GPS = new G4GeneralParticleSource();
-  GPS->AddaSource(1);
-  particleGun = GPS->GetCurrentSource();
+  //GPS = new G4GeneralParticleSource();
+  MyGPS->AddaSource(1);
+  particleGun = MyGPS->GetCurrentSource();
   particleGun->SetNumberOfParticles(n_particle);
   particleGun->GetEneDist()->SetMonoEnergy(1.0*GeV);
   particleGun->GetAngDist()->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.0));
@@ -66,7 +66,7 @@ WCSimPrimaryGeneratorAction::WCSimPrimaryGeneratorAction(
   particleGun->GetPosDist()->
     SetCentreCoords(G4ThreeVector(0.*m,0.*m,0.*m));
   particleGun->GetPosDist()->SetPosDisType("Point");
-
+  
   messenger = new WCSimPrimaryGeneratorMessenger(this);
   useMulineEvt = true;
   useNormalEvt = false;
@@ -82,7 +82,7 @@ WCSimPrimaryGeneratorAction::~WCSimPrimaryGeneratorAction()
   }
   inputFile.close();
   delete particleGun;
-  delete GPS;
+
   delete MyGPS;   //T. Akiri: Delete the GPS variable
   delete messenger;
 }
@@ -225,14 +225,13 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	particleGun->GetEneDist()->SetMonoEnergy(energy*MeV);
 	particleGun->GetPosDist()->SetCentreCoords(vtx);
 	particleGun->GetAngDist()->SetParticleMomentumDirection(dir);
-	GPS->GeneratePrimaryVertex(anEvent);
+	MyGPS->GeneratePrimaryVertex(anEvent);
       }
   }
 
   else if (useNormalEvt)
   {      // manual gun operation
-    GPS->GeneratePrimaryVertex(anEvent);
-
+    MyGPS->GeneratePrimaryVertex(anEvent);
     G4ThreeVector P  =anEvent->GetPrimaryVertex()->GetPrimary()->GetMomentum();
     G4ThreeVector vtx=anEvent->GetPrimaryVertex()->GetPosition();
     G4double m       =anEvent->GetPrimaryVertex()->GetPrimary()->GetMass();
@@ -244,6 +243,13 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 //     particleGun->GetEneDist()->SetMonoEnergy(E);
 //     particleGun->GetPosDist()->SetCentreCoords(vtx);
 //     particleGun->GetAngDist()->SetParticleMomentumDirection(dir);
+
+    G4cout << "particle generated:" << G4endl
+	   << pdg << G4endl
+	   << E/MeV << "MeV" << G4endl
+	   << vtx.x() << '\t' << vtx.y() << '\t' << vtx.z() << G4endl
+	   << dir.x() << '\t' << dir.y() << '\t' << dir.z() << G4endl;
+
 
     SetVtx(vtx);
     SetBeamEnergy(E);

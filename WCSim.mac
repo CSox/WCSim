@@ -106,15 +106,40 @@
 
 # Or you can use the G4 Particle Gun
 /mygen/generator normal
-/gun/particle neutron
-#/gun/particle pi0
-/gun/energy 1 eV
-/gun/direction 1 0 0 
-/gun/position 0 0 0  
+/gps/source/clear
+/gps/source/add 1
+/gps/particle neutron
+#/gps/particle pi0
+/gps/ene/type Mono
+/gps/ene/mono 1 eV
+#/gps/direction 1 0 0 
+/gps/position 0 0 0 
+/gps/pos/type Point
+/gps/ang/type iso
 
 ## change the name of the output root file, default = wcsim.root
 
-/WCSimIO/RootFile wcsim.root
+/WCSimIO/RootFile neutrons.root
 
-/run/beamOn 10
+/run/beamOn 100
+
+##############################################
+/mygen/generator normal
+/gps/source/clear
+/gps/source/add	1
+/gps/particle e-
+#/gps/particle pi0
+/gps/ene/type Mono
+/gps/ene/mono 8 MeV
+#/gps/direction 1 0 0 
+/gps/position 0 0 0 
+/gps/pos/type Point
+/gps/ang/type iso
+
+## change the name of the output root file, default = wcsim.root
+
+/WCSimIO/RootFile electrons.root
+
+/run/beamOn 100
+
 #exit
